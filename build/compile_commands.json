@@ -1,0 +1,42 @@
+[
+{
+  "directory": "/tmp/binary-protocol-analyzer_1773291536/build",
+  "command": "/bin/c++  -I/tmp/binary-protocol-analyzer_1773291536/src -Wall -Wextra -Wpedantic -std=gnu++17 -o CMakeFiles/binary_protocol_analyzer.dir/src/main.cpp.o -c /tmp/binary-protocol-analyzer_1773291536/src/main.cpp",
+  "file": "/tmp/binary-protocol-analyzer_1773291536/src/main.cpp"
+},
+{
+  "directory": "/tmp/binary-protocol-analyzer_1773291536/build",
+  "command": "/bin/c++  -I/tmp/binary-protocol-analyzer_1773291536/src -Wall -Wextra -Wpedantic -std=gnu++17 -o CMakeFiles/binary_protocol_analyzer.dir/src/protocol_parser.cpp.o -c /tmp/binary-protocol-analyzer_1773291536/src/protocol_parser.cpp",
+  "file": "/tmp/binary-protocol-analyzer_1773291536/src/protocol_parser.cpp"
+},
+{
+  "directory": "/tmp/binary-protocol-analyzer_1773291536/build",
+  "command": "/bin/c++  -I/tmp/binary-protocol-analyzer_1773291536/src -Wall -Wextra -Wpedantic -std=gnu++17 -o CMakeFiles/binary_protocol_analyzer.dir/src/packet_analyzer.cpp.o -c /tmp/binary-protocol-analyzer_1773291536/src/packet_analyzer.cpp",
+  "file": "/tmp/binary-protocol-analyzer_1773291536/src/packet_analyzer.cpp"
+},
+{
+  "directory": "/tmp/binary-protocol-analyzer_1773291536/build",
+  "command": "/bin/c++  -I/tmp/binary-protocol-analyzer_1773291536/src -Wall -Wextra -Wpedantic -std=gnu++17 -o CMakeFiles/binary_protocol_analyzer.dir/src/hexdump.cpp.o -c /tmp/binary-protocol-analyzer_1773291536/src/hexdump.cpp",
+  "file": "/tmp/binary-protocol-analyzer_1773291536/src/hexdump.cpp"
+},
+{
+  "directory": "/tmp/binary-protocol-analyzer_1773291536/build",
+  "command": "/bin/c++ -DUNIT_TEST -I/tmp/binary-protocol-analyzer_1773291536/src -Wall -Wextra -Wpedantic -std=gnu++17 -o CMakeFiles/test_parser.dir/tests/test_parser.cpp.o -c /tmp/binary-protocol-analyzer_1773291536/tests/test_parser.cpp",
+  "file": "/tmp/binary-protocol-analyzer_1773291536/tests/test_parser.cpp"
+},
+{
+  "directory": "/tmp/binary-protocol-analyzer_1773291536/build",
+  "command": "/bin/c++ -DUNIT_TEST -I/tmp/binary-protocol-analyzer_1773291536/src -Wall -Wextra -Wpedantic -std=gnu++17 -o CMakeFiles/test_parser.dir/src/protocol_parser.cpp.o -c /tmp/binary-protocol-analyzer_1773291536/src/protocol_parser.cpp",
+  "file": "/tmp/binary-protocol-analyzer_1773291536/src/protocol_parser.cpp"
+},
+{
+  "directory": "/tmp/binary-protocol-analyzer_1773291536/build",
+  "command": "/bin/c++ -DUNIT_TEST -I/tmp/binary-protocol-analyzer_1773291536/src -Wall -Wextra -Wpedantic -std=gnu++17 -o CMakeFiles/test_parser.dir/src/packet_analyzer.cpp.o -c /tmp/binary-protocol-analyzer_1773291536/src/packet_analyzer.cpp",
+  "file": "/tmp/binary-protocol-analyzer_1773291536/src/packet_analyzer.cpp"
+},
+{
+  "directory": "/tmp/binary-protocol-analyzer_1773291536/build",
+  "command": "/bin/c++ -DUNIT_TEST -I/tmp/binary-protocol-analyzer_1773291536/src -Wall -Wextra -Wpedantic -std=gnu++17 -o CMakeFiles/test_parser.dir/src/hexdump.cpp.o -c /tmp/binary-protocol-analyzer_1773291536/src/hexdump.cpp",
+  "file": "/tmp/binary-protocol-analyzer_1773291536/src/hexdump.cpp"
+}
+]
