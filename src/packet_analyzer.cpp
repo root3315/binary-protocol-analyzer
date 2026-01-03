@@ -44,6 +44,28 @@ std::string IPv4Header::destAddrString() const {
     return oss.str();
 }
 
+std::string IPv6Header::srcAddrString() const {
+    std::ostringstream oss;
+    for (int i = 0; i < 16; i += 2) {
+        if (i > 0) oss << ":";
+        uint16_t segment = (static_cast<uint16_t>(src_addr[i]) << 8) |
+                           static_cast<uint16_t>(src_addr[i + 1]);
+        oss << std::hex << segment << std::dec;
+    }
+    return oss.str();
+}
+
+std::string IPv6Header::destAddrString() const {
+    std::ostringstream oss;
+    for (int i = 0; i < 16; i += 2) {
+        if (i > 0) oss << ":";
+        uint16_t segment = (static_cast<uint16_t>(dest_addr[i]) << 8) |
+                           static_cast<uint16_t>(dest_addr[i + 1]);
+        oss << std::hex << segment << std::dec;
+    }
+    return oss.str();
+}
+
 PacketAnalyzer::PacketAnalyzer() : parser_(Endianness::Big) {}
 
 void PacketAnalyzer::reset() {
@@ -85,6 +107,8 @@ void PacketAnalyzer::analyze(const std::vector<uint8_t>& packet) {
 
     if (info.type == PacketType::IPv4) {
         parseIPv4(packet, 14, info);
+    } else if (info.type == PacketType::IPv6) {
+        parseIPv6(packet, 14, info);
     }
 
     if (info.has_ipv4) {
@@ -162,9 +186,58 @@ void PacketAnalyzer::parseIPv4(const std::vector<uint8_t>& data, size_t offset,
     info.header_size = offset + ip.headerSize();
     
     std::ostringstream desc;
-    desc << info.description << " | IPv4: " << ip.srcAddrString() 
+    desc << info.description << " | IPv4: " << ip.srcAddrString()
          << " -> " << ip.destAddrString();
     info.description = desc.str();
+}
+
+void PacketAnalyzer::parseIPv6(const std::vector<uint8_t>& data, size_t offset,
+                                PacketInfo& info) {
+    if (offset + 40 > data.size()) return;
+
+    IPv6Header& ip6 = info.ipv6_header;
+
+    uint8_t ver_tc = data[offset];
+    ip6.version = (ver_tc >> 4) & 0x0F;
+    ip6.traffic_class = (ver_tc & 0x0F) << 4;
+
+    uint8_t tc_fl = data[offset + 1];
+    ip6.traffic_class |= (tc_fl >> 4) & 0x0F;
+    ip6.flow_label = (tc_fl & 0x0F) << 16;
+
+    uint16_t flow_label_low;
+    parser_.parseUint16(data, offset + 2, flow_label_low);
+    ip6.flow_label |= flow_label_low;
+
+    parser_.parseUint16(data, offset + 4, ip6.payload_length);
+    ip6.next_header = data[offset + 6];
+    ip6.hop_limit = data[offset + 7];
+
+    for (int i = 0; i < 16; ++i) {
+        ip6.src_addr[i] = data[offset + 8 + i];
+        ip6.dest_addr[i] = data[offset + 24 + i];
+    }
+
+    if (ip6.version != 6) return;
+
+    info.has_ipv6 = true;
+    info.header_size = offset + ip6.headerSize();
+
+    std::ostringstream desc;
+    desc << info.description << " | IPv6: " << ip6.srcAddrString()
+         << " -> " << ip6.destAddrString();
+    info.description = desc.str();
+
+    uint8_t next_header = ip6.next_header;
+    size_t next_offset = offset + 40;
+
+    if (next_header == 6 && next_offset < data.size()) {
+        parseTCP(data, next_offset, info);
+    } else if (next_header == 17 && next_offset < data.size()) {
+        parseUDP(data, next_offset, info);
+    } else if (next_header == 58 && next_offset < data.size()) {
+        info.type = PacketType::ICMP;
+    }
 }
 
 void PacketAnalyzer::parseTCP(const std::vector<uint8_t>& data, size_t offset,
@@ -222,12 +295,17 @@ void PacketAnalyzer::updateStats(const PacketInfo& info) {
     stats_.total_packets++;
     stats_.total_bytes += info.total_size;
     stats_.packet_counts[info.type]++;
-    
+
     if (info.has_eth) {
         std::string src_mac = macToString(info.eth_header.src_mac);
         stats_.mac_counts[src_mac]++;
     }
-    
+
+    if (info.has_ipv6) {
+        std::string src_ip = ipv6ToString(info.ipv6_header.src_addr);
+        stats_.mac_counts[src_ip]++;
+    }
+
     if (info.has_tcp) {
         stats_.port_counts[info.tcp_header.src_port]++;
         stats_.port_counts[info.tcp_header.dest_port]++;
@@ -259,6 +337,17 @@ std::string PacketAnalyzer::ipv4ToString(uint32_t addr) const {
         << ((addr >> 16) & 0xFF) << "."
         << ((addr >> 8) & 0xFF) << "."
         << (addr & 0xFF);
+    return oss.str();
+}
+
+std::string PacketAnalyzer::ipv6ToString(const uint8_t addr[16]) const {
+    std::ostringstream oss;
+    for (int i = 0; i < 16; i += 2) {
+        if (i > 0) oss << ":";
+        uint16_t segment = (static_cast<uint16_t>(addr[i]) << 8) |
+                           static_cast<uint16_t>(addr[i + 1]);
+        oss << std::hex << segment << std::dec;
+    }
     return oss.str();
 }
 

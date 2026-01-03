@@ -43,10 +43,25 @@ struct IPv4Header {
     uint16_t header_checksum;
     uint32_t src_addr;
     uint32_t dest_addr;
-    
+
     std::string srcAddrString() const;
     std::string destAddrString() const;
     size_t headerSize() const { return ihl * 4; }
+};
+
+struct IPv6Header {
+    uint8_t version;
+    uint8_t traffic_class;
+    uint32_t flow_label;
+    uint16_t payload_length;
+    uint8_t next_header;
+    uint8_t hop_limit;
+    uint8_t src_addr[16];
+    uint8_t dest_addr[16];
+
+    std::string srcAddrString() const;
+    std::string destAddrString() const;
+    size_t headerSize() const { return 40; }
 };
 
 struct TCPHeader {
@@ -82,14 +97,16 @@ struct PacketInfo {
     size_t payload_size;
     std::string description;
     std::vector<uint8_t> raw_data;
-    
+
     EthernetHeader eth_header;
     IPv4Header ipv4_header;
+    IPv6Header ipv6_header;
     TCPHeader tcp_header;
     UDPHeader udp_header;
-    
+
     bool has_eth = false;
     bool has_ipv4 = false;
+    bool has_ipv6 = false;
     bool has_tcp = false;
     bool has_udp = false;
 };
@@ -135,12 +152,14 @@ private:
     
     void parseEthernet(const std::vector<uint8_t>& data, PacketInfo& info);
     void parseIPv4(const std::vector<uint8_t>& data, size_t offset, PacketInfo& info);
+    void parseIPv6(const std::vector<uint8_t>& data, size_t offset, PacketInfo& info);
     void parseTCP(const std::vector<uint8_t>& data, size_t offset, PacketInfo& info);
     void parseUDP(const std::vector<uint8_t>& data, size_t offset, PacketInfo& info);
-    
+
     void updateStats(const PacketInfo& info);
     std::string macToString(const uint8_t mac[6]) const;
     std::string ipv4ToString(uint32_t addr) const;
+    std::string ipv6ToString(const uint8_t addr[16]) const;
 };
 
 class PacketFilter {
